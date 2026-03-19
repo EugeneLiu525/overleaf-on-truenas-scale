@@ -1,4 +1,4 @@
-version: '3.7'
+version: '3.8'
 services:
   sharelatex:
     restart: always
@@ -6,7 +6,7 @@ services:
     container_name: sharelatex
     depends_on:
       mongo:
-        condition: service_healthy
+        condition: service_started
       redis:
         condition: service_started
     ports:
@@ -20,7 +20,7 @@ services:
       - /mnt/app/overleaf/output:/var/lib/overleaf/data/output
     environment:
       OVERLEAF_APP_NAME: Overleaf Community Edition
-      OVERLEAF_MONGO_URL: mongodb://mongo/sharelatex
+      OVERLEAF_MONGO_URL: mongodb://mongo:27017/sharelatex
       OVERLEAF_REDIS_HOST: redis
       REDIS_HOST: redis
       ENABLED_LINKED_FILE_TYPES: "project_file,project_output_file"
@@ -31,7 +31,6 @@ services:
       SANDBOXED_COMPILES_HOST_DIR_OUTPUT: "/var/lib/overleaf/data/output"
       DOCKER_RUNNER: "true"
       SANDBOXED_COMPILES_SIBLING_CONTAINERS: "true"
-
   mongo:
     restart: always
     image: mongo:8.0
@@ -42,11 +41,11 @@ services:
     environment:
       MONGO_INITDB_DATABASE: sharelatex
     healthcheck:
-      test: echo 'db.stats().ok' | mongosh localhost:27017/test --quiet
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
       interval: 10s
       timeout: 10s
       retries: 5
-
+      start_period: 40s
   redis:
     restart: always
     image: redis:6.2
