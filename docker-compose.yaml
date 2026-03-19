@@ -1,3 +1,4 @@
+version: '3.7'
 services:
   sharelatex:
     restart: always
@@ -9,12 +10,14 @@ services:
       redis:
         condition: service_started
     ports:
-      - 80:80
+      - 8080:80
     stop_grace_period: 60s
     volumes:
-      - /mnt/hdd/apps/overleaf/data:/var/lib/overleaf/data
-      - /mnt/ssd/apps/overleaf/compiles:/var/lib/overleaf/data/compiles
-      - /mnt/ssd/apps/overleaf/output:/var/lib/overleaf/data/output
+      # change to your own hdd route
+      - /mnt/share/apps/overleaf/data:/var/lib/overleaf/data
+      # change to your own ssd route
+      - /mnt/app/overleaf/compiles:/var/lib/overleaf/data/compiles
+      - /mnt/app/overleaf/output:/var/lib/overleaf/data/output
     environment:
       OVERLEAF_APP_NAME: Overleaf Community Edition
       OVERLEAF_MONGO_URL: mongodb://mongo/sharelatex
@@ -34,7 +37,8 @@ services:
     image: mongo:8.0
     container_name: mongo
     volumes:
-      - /mnt/ssd/apps/overleaf/mongo:/data/db
+      # change to your own ssd route
+      - /mnt/share/apps/overleaf/mongo:/data/db
     environment:
       MONGO_INITDB_DATABASE: sharelatex
     healthcheck:
@@ -48,4 +52,5 @@ services:
     image: redis:6.2
     container_name: redis
     volumes:
-      - /mnt/ssd/apps/overleaf/redis:/data
+      # change to your own ssd route
+      - /mnt/share/apps/overleaf/redis:/data
